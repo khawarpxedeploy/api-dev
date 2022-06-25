@@ -11,10 +11,10 @@ class ProductsController extends Controller
     public function productsList(Request $request){
 
         $products = Product::where('status', 1)->get();
-        if(!$products){
+        $success['products'] = $products;
+        if($products->isEmpty()){
             return $this->sendResponse($success, 'No products found!');
         }
-        $success['products'] = $products;
         return $this->sendResponse($success, 'Products found!.');
     }
 }
