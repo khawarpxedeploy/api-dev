@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use Hash;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Customer;
 
 class CustomerController extends Controller
@@ -68,5 +69,44 @@ class CustomerController extends Controller
         } else {
             return $this->sendError('Unauthorised.', ['error'=>'User does not exist']);
         }
+    }
+
+    public function getUser(Request $request){
+        $user = $request->user();
+        $user->makeHidden(['id','created_at','updated_at']);
+        return $user;
+    }
+
+    public function profileUpdate(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'image' => 'nullable|image:1024'
+        ]);
+   
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors());       
+        } 
+
+        try {
+
+            $user = $request->user();
+            $user->name = $request->name;
+            $user->phone = $request->phone;
+            $user->address = $request->address;
+            if($request->hasFile('image')){
+                $user->image = $request->image->store('users','public');
+            }
+            $user->save();
+            $user->makeHidden(['id','created_at','updated_at']);
+            if($user->image){
+                $user->image = env('APP_URL').'/'.$user->image;
+            }
+            $success['user'] = $user;
+            return $this->sendResponse($success, 'User login successfully.');
+
+        } catch(Exception $e){
+            return $this->sendError('Server Error.', ['error'=> $e->getMessage()]);
+        }
+
     }
 }

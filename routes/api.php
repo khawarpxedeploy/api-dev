@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Client\CustomerController;
+use App\Http\Controllers\Api\V1\Client\ProductsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,9 +21,18 @@ Route::controller(CustomerController::class)->group(function(){
     Route::post('login', 'login');
 });
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    $user = $request->user();
-    $user->makeHidden(['id','created_at','updated_at']);
-    return $user;
+Route::middleware('auth:sanctum')->group(function(){
+
+    //Customer Actions
+    Route::controller(CustomerController::class)->group(function(){
+        Route::post('user', 'getUser');
+        Route::post('profile-update', 'profileUpdate');
+        Route::post('products', 'productsList');
+    });
+
+    //Product Actions
+    Route::controller(ProductsController::class)->group(function(){
+        Route::get('products', 'productsList');
+    });
     
 });
