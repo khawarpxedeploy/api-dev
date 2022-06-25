@@ -10,7 +10,7 @@ class Product extends Model
     public function getImageAttribute($value)
     {
         if($value){
-           $value = env('APP_URL').Storage::url($value);
+           $value = Storage::url($value);
         }
         return $value;
     }
