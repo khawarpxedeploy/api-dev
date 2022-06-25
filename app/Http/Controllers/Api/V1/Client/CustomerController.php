@@ -99,7 +99,7 @@ class CustomerController extends Controller
             $user->save();
             $user->makeHidden(['id','created_at','updated_at']);
             if($user->image){
-                $user->image = env('APP_URL').'/'.$user->image;
+                $user->image = env('APP_URL').Storage::url($user->image);
             }
             $success['user'] = $user;
             return $this->sendResponse($success, 'User login successfully.');
